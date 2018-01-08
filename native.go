@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"go/format"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -116,7 +118,11 @@ func ProcessFileNative(filePath string, from string, to string) {
 			numChanges,
 			"changes",
 			reset, "\n\n")
-		ioutil.WriteFile(filePath, []byte(output), os.ModePerm)
+		formatedSource, err := format.Source([]byte(output))
+		if err != nil {
+			log.Fatal(err)
+		}
+		ioutil.WriteFile(filePath, formatedSource, os.ModePerm)
 	} else {
 		fmt.Println(yellow+
 			"No changes to write on this file.",

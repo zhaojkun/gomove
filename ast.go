@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"go/format"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -78,8 +80,11 @@ func ProcessFileAST(filePath string, from string, to string) {
 		// Print the new AST tree to a new output buffer
 		var outputBuffer bytes.Buffer
 		printer.Fprint(&outputBuffer, fSet, file)
-
-		ioutil.WriteFile(filePath, outputBuffer.Bytes(), os.ModePerm)
+		output, err := format.Source(outputBuffer.Bytes())
+		if err != nil {
+			log.Fatal(err)
+		}
+		ioutil.WriteFile(filePath, output, os.ModePerm)
 		fmt.Println(yellow+
 			"File",
 			filePath,

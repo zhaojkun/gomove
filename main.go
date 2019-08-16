@@ -57,6 +57,9 @@ func ScanDir(dir string, from string, to string, c *cli.Context) {
 	if from != "" && to != "" {
 		// Scan directory for files
 		filepath.Walk(dir, func(filePath string, info os.FileInfo, err error) error {
+			if info.IsDir() && info.Name() == "vendor" {
+				return filepath.SkipDir
+			}
 			// Only process go files
 			if path.Ext(filePath) == ".go" {
 				ProcessFile(filePath, from, to, c)

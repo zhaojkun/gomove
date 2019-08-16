@@ -55,8 +55,9 @@ func ProcessFileNative(filePath string, from string, to string) {
 
 		// If it is a single import statement, replace the path in that line
 		if strings.Contains(bareLine, "import\"") {
-
-			newImport := strings.Replace(line, from, to, -1)
+			fromStr := fmt.Sprintf(`"%s"`, from)
+			toStr := fmt.Sprintf(`"%s"`, to)
+			newImport := strings.Replace(line, fromStr, toStr, -1)
 			output += newImport + "\n"
 			if line != newImport {
 				numChanges++
@@ -86,7 +87,9 @@ func ProcessFileNative(filePath string, from string, to string) {
 
 		// If it is a import line, replace the import
 		if isImportLine {
-			newImport := strings.Replace(line, from, to, -1)
+			fromStr := fmt.Sprintf(`"%s"`, from)
+			toStr := fmt.Sprintf(`"%s"`, to)
+			newImport := strings.Replace(line, fromStr, toStr, -1)
 			output += newImport + "\n"
 			if line != newImport {
 				numChanges++

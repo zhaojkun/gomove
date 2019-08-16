@@ -27,6 +27,11 @@ func main() {
 			Usage: "only move imports in a file",
 		},
 		cli.StringFlag{
+			Name:  "prefix,p",
+			Value: "true",
+			Usage: "path prefix will be used(true)     path exact matched(false)",
+		},
+		cli.StringFlag{
 			Name:  "safe-mode, s",
 			Value: "false",
 			Usage: "run program in safe mode (comments will be wiped)",
@@ -36,13 +41,14 @@ func main() {
 	app.Action = func(c *cli.Context) {
 		file := c.String("file")
 		dir := c.String("dir")
+		usePreifx := c.String("prefix")
 		from := c.Args().Get(0)
 		to := c.Args().Get(1)
 
 		if file != "" {
-			ProcessFile(file, from, to, c)
+			ProcessFile(file, from, to, usePrefix, c)
 		} else {
-			ScanDir(dir, from, to, c)
+			ScanDir(dir, from, to, usePrefix, c)
 		}
 
 	}
@@ -51,7 +57,7 @@ func main() {
 }
 
 // ScanDir scans a directory for go files and
-func ScanDir(dir string, from string, to string, c *cli.Context) {
+func ScanDir(dir string, from string, to string, usePrefix string, c *cli.Context) {
 
 	// If from and to are not empty scan all files
 	if from != "" && to != "" {
@@ -62,7 +68,7 @@ func ScanDir(dir string, from string, to string, c *cli.Context) {
 			}
 			// Only process go files
 			if path.Ext(filePath) == ".go" {
-				ProcessFile(filePath, from, to, c)
+				ProcessFile(filePath, from, to, usePrefix, c)
 			}
 			return nil
 		})
@@ -74,10 +80,11 @@ func ScanDir(dir string, from string, to string, c *cli.Context) {
 }
 
 // ProcessFile processes file according to what mode is chosen
-func ProcessFile(filePath string, from string, to string, c *cli.Context) {
+func ProcessFile(filePath string, from string, to string, prefixMode string, c *cli.Context) {
+	usePrefix := prefixMode == "true"
 	if c.String("safe-mode") == "true" {
-		ProcessFileAST(filePath, from, to)
+		ProcessFileAST(filePath, from, to, usePrefix)
 	} else {
-		ProcessFileNative(filePath, from, to)
+		ProcessFileNative(filePath, from, to, usePrefix)
 	}
 }

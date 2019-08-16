@@ -14,7 +14,11 @@ import (
 )
 
 // ProcessFileNative processes files uing native string search instead of ast parsing
-func ProcessFileNative(filePath string, from string, to string) {
+func ProcessFileNative(filePath string, from string, to string, usePrefix bool) {
+	if !usePrefix {
+		from = fmt.Sprintf(`"%s"`, from)
+		to = fmt.Sprintf(`"%s"`, to)
+	}
 	//Colors to be used on the console
 	red := ansi.ColorCode("red+bh")
 	white := ansi.ColorCode("white+bh")
@@ -55,9 +59,7 @@ func ProcessFileNative(filePath string, from string, to string) {
 
 		// If it is a single import statement, replace the path in that line
 		if strings.Contains(bareLine, "import\"") {
-			fromStr := fmt.Sprintf(`"%s"`, from)
-			toStr := fmt.Sprintf(`"%s"`, to)
-			newImport := strings.Replace(line, fromStr, toStr, -1)
+			newImport := strings.Replace(line, from, to, -1)
 			output += newImport + "\n"
 			if line != newImport {
 				numChanges++
@@ -87,9 +89,7 @@ func ProcessFileNative(filePath string, from string, to string) {
 
 		// If it is a import line, replace the import
 		if isImportLine {
-			fromStr := fmt.Sprintf(`"%s"`, from)
-			toStr := fmt.Sprintf(`"%s"`, to)
-			newImport := strings.Replace(line, fromStr, toStr, -1)
+			newImport := strings.Replace(line, from, to, -1)
 			output += newImport + "\n"
 			if line != newImport {
 				numChanges++

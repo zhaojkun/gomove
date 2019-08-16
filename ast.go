@@ -17,7 +17,7 @@ import (
 )
 
 // ProcessFileAST processes the files using golang's AST parser
-func ProcessFileAST(filePath string, from string, to string) {
+func ProcessFileAST(filePath string, from string, to string, usePrefix bool) {
 
 	//Colors to be used on the console
 	red := ansi.ColorCode("red+bh")
@@ -49,9 +49,14 @@ func ProcessFileAST(filePath string, from string, to string) {
 		for _, mImport := range mPackage {
 			// Since astutil returns the path string with quotes, remove those
 			importString := strings.TrimSuffix(strings.TrimPrefix(mImport.Path.Value, "\""), "\"")
-
+			var matched bool
+			if usePrefix {
+				matched = strings.Contains(importString, from)
+			} else {
+				matched = importString == from
+			}
 			// If the path matches the oldpath, replace it with the new one
-			if strings.Contains(importString, from) {
+			if matched {
 				//If it needs to be replaced, increase numChanges so we can write the file later
 				numChanges++
 
